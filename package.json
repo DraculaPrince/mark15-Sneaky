@@ -1,5 +1,5 @@
 {
-  "name": "antd",
+  "name": "mark15",
   "version": "5.9.4",
   "packageManager": "^npm@9.0.0",
   "description": "An enterprise-class UI design language and React components implementation",
@@ -17,11 +17,11 @@
   ],
   "homepage": "https://ant.design",
   "bugs": {
-    "url": "https://github.com/ant-design/ant-design/issues"
+    "url": "https://github.com/DraculaPrince/mark15-Sneaky/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ant-design/ant-design"
+    "url": "https://github.com/DraculaPrince/mark15-Sneaky"
   },
   "license": "MIT",
   "contributors": [
