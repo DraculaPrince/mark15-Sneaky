@@ -25,6 +25,6 @@ jobs:
       # - run: npm ci
       - run: npm install
       - run: npm run build
-      - run: npm publish --provenance --access pubilc
+      - run: npm pub
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
