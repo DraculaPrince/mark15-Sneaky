@@ -292,7 +292,7 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
     legacyLocale,
     parentContext,
     iconPrefixCls: customIconPrefixCls,
-    theme,
+    theme = {},
     componentDisabled,
     segmented,
     statistic,

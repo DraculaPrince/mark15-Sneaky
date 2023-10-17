@@ -3,11 +3,18 @@ import isEqual from 'rc-util/lib/isEqual';
 import type { OverrideToken } from '../../theme/interface';
 import type { ThemeConfig } from '../context';
 import { defaultConfig } from '../../theme/internal';
+import markTheme from '../../_mark-style/markTheme';
 
 export default function useTheme(
-  theme?: ThemeConfig,
+  theme: ThemeConfig,
   parentTheme?: ThemeConfig,
 ): ThemeConfig | undefined {
+  // mark15 override
+  theme.components = theme.components
+    ? { ...markTheme.components, ...theme.components }
+    : markTheme.components;
+  theme.token = theme.token ? { ...markTheme.token, ...theme.token } : markTheme.token;
+
   const themeConfig = theme || {};
   const parentThemeConfig: ThemeConfig =
     themeConfig.inherit === false || !parentTheme ? defaultConfig : parentTheme;
