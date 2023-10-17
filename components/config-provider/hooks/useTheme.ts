@@ -82,8 +82,8 @@ export default function useTheme(
           ...parentThemeConfig.token,
           ...themeConfig.token,
         },
-        components: mergedComponents,
         cssVar: mergedCssVar,
+        components: mergedComponents,
       };
     },
     [themeConfig, parentThemeConfig],
