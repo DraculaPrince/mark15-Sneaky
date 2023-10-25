@@ -11,8 +11,10 @@ export default {
       colorBgContainerDisabled: '#F2F3F5',
       colorTextDisabled: '#C3C7CC',
       textHoverBg: '#FFFFFF',
-      colorPrimaryHover: '#457dfe',
-      colorPrimaryActive: '#2859CC',
+      paddingInline: 16,
+      paddingInlineSM: 8,
+      colorText: '#3270FF',
+      defaultColor: '#4E5969',
     },
     Tabs: {
       horizontalItemPadding: '20px 0 16px 0',
@@ -50,6 +52,15 @@ export default {
       textFontSize: 14,
       textFontSizeSM: 12,
     },
+    Pagination: {
+      itemActiveBg: 'rgb(50, 112, 255)',
+      wireframe: true,
+      colorBorder: 'rgb(220, 222, 226)',
+    },
+    Checkbox: {
+      colorTextDisabled: 'rgb(78, 89, 105)',
+      colorBgContainerDisabled: 'rgb(242, 243, 245)',
+    },
   },
   token: {
     colorPrimary: '#3270ff',
@@ -63,5 +74,8 @@ export default {
     colorLinkHover: '#457dfe',
     colorLinkActive: '#2859cc',
     colorTextBase: '#1d2129',
+    colorText: '#4E5969',
+    colorPrimaryHover: '#457dfe',
+    colorPrimaryActive: '#2859cc',
   },
 } as ThemeConfig;
