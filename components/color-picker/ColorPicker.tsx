@@ -12,6 +12,8 @@ import { getStatusClassNames } from '../_util/statusUtils';
 import { devUseWarning } from '../_util/warning';
 import type { ConfigConsumerProps } from '../config-provider/context';
 import { ConfigContext } from '../config-provider/context';
+import DisabledContext from '../config-provider/DisabledContext';
+import useCSSVarCls from '../config-provider/hooks/useCSSVarCls';
 import useSize from '../config-provider/hooks/useSize';
 import type { SizeType } from '../config-provider/SizeContext';
 import { FormItemInputContext, NoFormStyle } from '../form/context';
@@ -30,8 +32,8 @@ import type {
   TriggerPlacement,
   TriggerType,
 } from './interface';
-import useStyle from './style/index';
-import { customizePrefixCls, genAlphaColor, generateColor, getAlphaColor } from './util';
+import useStyle from './style';
+import { genAlphaColor, generateColor, getAlphaColor } from './util';
 
 export type ColorPickerProps = Omit<
   RcColorPickerProps,
@@ -58,6 +60,7 @@ export type ColorPickerProps = Omit<
   styles?: { popup?: CSSProperties; popupOverlayInner?: CSSProperties };
   rootClassName?: string;
   disabledAlpha?: boolean;
+  [key: `data-${string}`]: string;
   onOpenChange?: (open: boolean) => void;
   onFormatChange?: (format: ColorFormat) => void;
   onChange?: (value: Color, hex: string) => void;
@@ -89,6 +92,7 @@ const ColorPicker: CompoundedComponent = (props) => {
     className,
     size: customizeSize,
     rootClassName,
+    prefixCls: customizePrefixCls,
     styles,
     disabledAlpha = false,
     onFormatChange,
@@ -99,10 +103,12 @@ const ColorPicker: CompoundedComponent = (props) => {
     getPopupContainer,
     autoAdjustOverflow = true,
     destroyTooltipOnHide,
+    ...rest
   } = props;
 
   const { getPrefixCls, direction, colorPicker } = useContext<ConfigConsumerProps>(ConfigContext);
-
+  const contextDisabled = useContext(DisabledContext);
+  const mergedDisabled = disabled ?? contextDisabled;
   const [, token] = useToken();
 
   const [colorValue, setColorValue] = useColorState(token.colorPrimary, {
@@ -111,7 +117,7 @@ const ColorPicker: CompoundedComponent = (props) => {
   });
   const [popupOpen, setPopupOpen] = useMergedState(false, {
     value: open,
-    postState: (openData) => !disabled && openData,
+    postState: (openData) => !mergedDisabled && openData,
     onChange: onOpenChange,
   });
   const [formatValue, setFormatValue] = useMergedState(format, {
@@ -131,9 +137,10 @@ const ColorPicker: CompoundedComponent = (props) => {
 
   // ===================== Style =====================
   const mergedSize = useSize(customizeSize);
-  const [wrapSSR, hashId] = useStyle(prefixCls);
+  const rootCls = useCSSVarCls(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle(prefixCls, rootCls);
   const rtlCls = { [`${prefixCls}-rtl`]: direction };
-  const mergeRootCls = classNames(rootClassName, rtlCls);
+  const mergeRootCls = classNames(rootClassName, cssVarCls, rootCls, rtlCls);
   const mergeCls = classNames(
     getStatusClassNames(prefixCls, contextStatus),
     {
@@ -145,7 +152,7 @@ const ColorPicker: CompoundedComponent = (props) => {
     className,
     hashId,
   );
-  const mergePopupCls = classNames(prefixCls, rtlCls);
+  const mergePopupCls = classNames(prefixCls, mergeRootCls);
 
   const popupAllowCloseRef = useRef(true);
 
@@ -217,7 +224,7 @@ const ColorPicker: CompoundedComponent = (props) => {
     color: colorValue,
     allowClear,
     colorCleared,
-    disabled,
+    disabled: mergedDisabled,
     disabledAlpha,
     presets,
     panelRender,
@@ -228,12 +235,14 @@ const ColorPicker: CompoundedComponent = (props) => {
 
   const mergedStyle: React.CSSProperties = { ...colorPicker?.style, ...style };
 
-  return wrapSSR(
+  // ============================ zIndex ============================
+
+  return wrapCSSVar(
     <Popover
       style={styles?.popup}
       overlayInnerStyle={styles?.popupOverlayInner}
       onOpenChange={(visible) => {
-        if (popupAllowCloseRef.current && !disabled) {
+        if (popupAllowCloseRef.current && !mergedDisabled) {
           setPopupOpen(visible);
         }
       }}
@@ -257,10 +266,11 @@ const ColorPicker: CompoundedComponent = (props) => {
           style={mergedStyle}
           color={value ? generateColor(value) : colorValue}
           prefixCls={prefixCls}
-          disabled={disabled}
+          disabled={mergedDisabled}
           colorCleared={colorCleared}
           showText={showText}
           format={formatValue}
+          {...rest}
         />
       )}
     </Popover>,

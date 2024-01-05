@@ -1,15 +1,17 @@
+import * as React from 'react';
 import DownOutlined from '@ant-design/icons/DownOutlined';
 import UpOutlined from '@ant-design/icons/UpOutlined';
 import classNames from 'classnames';
 import type { InputNumberProps as RcInputNumberProps, ValueType } from 'rc-input-number';
 import RcInputNumber from 'rc-input-number';
-import * as React from 'react';
+
 import type { InputStatus } from '../_util/statusUtils';
 import { getMergedStatus, getStatusClassNames } from '../_util/statusUtils';
 import ConfigProvider, { ConfigContext } from '../config-provider';
 import DisabledContext from '../config-provider/DisabledContext';
-import type { SizeType } from '../config-provider/SizeContext';
+import useCSSVarCls from '../config-provider/hooks/useCSSVarCls';
 import useSize from '../config-provider/hooks/useSize';
+import type { SizeType } from '../config-provider/SizeContext';
 import { FormItemInputContext, NoFormStyle } from '../form/context';
 import { NoCompactStyle, useCompactItemContext } from '../space/Compact';
 import useStyle from './style';
@@ -54,7 +56,8 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>((props,
   const prefixCls = getPrefixCls('input-number', customizePrefixCls);
 
   // Style
-  const [wrapSSR, hashId] = useStyle(prefixCls);
+  const rootCls = useCSSVarCls(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle(prefixCls, rootCls);
 
   const { compactSize, compactItemClassnames } = useCompactItemContext(prefixCls, direction);
   let upIcon = <UpOutlined className={`${prefixCls}-handler-up-inner`} />;
@@ -103,18 +106,21 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>((props,
   );
   const wrapperClassName = `${prefixCls}-group`;
 
+  // eslint-disable-next-line react/jsx-no-useless-fragment
+  const suffixNode = hasFeedback && <>{feedbackIcon}</>;
+
   const element = (
     <RcInputNumber
       ref={inputRef}
       disabled={mergedDisabled}
-      className={classNames(className, rootClassName, compactItemClassnames)}
+      className={classNames(cssVarCls, rootCls, className, rootClassName, compactItemClassnames)}
       upHandler={upIcon}
       downHandler={downIcon}
       prefixCls={prefixCls}
       readOnly={readOnly}
       controls={controlsTemp}
       prefix={prefix}
-      suffix={hasFeedback && feedbackIcon}
+      suffix={suffixNode}
       addonAfter={
         addonAfter && (
           <NoCompactStyle>
@@ -168,13 +174,11 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>((props,
     />
   );
 
-  return wrapSSR(element);
+  return wrapCSSVar(element);
 });
 
 const TypedInputNumber = InputNumber as unknown as (<T extends ValueType = ValueType>(
-  props: React.PropsWithChildren<InputNumberProps<T>> & {
-    ref?: React.Ref<HTMLInputElement>;
-  },
+  props: React.PropsWithChildren<InputNumberProps<T>> & React.RefAttributes<HTMLInputElement>,
 ) => React.ReactElement) & {
   displayName?: string;
   _InternalPanelDoNotUseOrYouWillBeFired: typeof PureInputNumber;

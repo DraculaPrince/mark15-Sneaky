@@ -34,7 +34,7 @@ const genNotificationPlacementStyle: GenerateStyle<NotificationToken, CSSObject>
 
   const bottomFadeIn = new Keyframes('antNotificationBottomFadeIn', {
     '0%': {
-      bottom: -animationMaxHeight,
+      bottom: token.calc(animationMaxHeight).mul(-1).equal(),
       opacity: 0,
     },
 
@@ -87,8 +87,14 @@ const genNotificationPlacementStyle: GenerateStyle<NotificationToken, CSSObject>
       },
 
       [`&${componentCls}-topLeft, &${componentCls}-bottomLeft`]: {
-        marginInlineEnd: 0,
-        marginInlineStart: notificationMarginEdge,
+        marginRight: {
+          value: 0,
+          _skip_check_: true,
+        },
+        marginLeft: {
+          value: notificationMarginEdge,
+          _skip_check_: true,
+        },
 
         [noticeCls]: {
           marginInlineEnd: 'auto',
@@ -103,4 +109,5 @@ const genNotificationPlacementStyle: GenerateStyle<NotificationToken, CSSObject>
     },
   };
 };
+
 export default genNotificationPlacementStyle;

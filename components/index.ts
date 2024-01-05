@@ -36,7 +36,7 @@ export type { CollapsePanelProps, CollapseProps } from './collapse';
 export { default as ColorPicker } from './color-picker';
 export type { ColorPickerProps } from './color-picker';
 export { default as ConfigProvider } from './config-provider';
-export type { ThemeConfig } from './config-provider';
+export type { ConfigProviderProps, ThemeConfig } from './config-provider';
 export { default as DatePicker } from './date-picker';
 export type { DatePickerProps } from './date-picker';
 export { default as Descriptions } from './descriptions';
@@ -57,7 +57,11 @@ export type { EmptyProps } from './empty';
 export { default as Flex } from './flex';
 export type { FlexProps } from './flex/interface';
 export { default as FloatButton } from './float-button';
-export type { FloatButtonGroupProps, FloatButtonProps } from './float-button/interface';
+export type {
+  FloatButtonGroupProps,
+  FloatButtonProps,
+  FloatButtonRef,
+} from './float-button/interface';
 export { default as Form } from './form';
 export type {
   FormInstance,

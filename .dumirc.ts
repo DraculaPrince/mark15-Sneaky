@@ -1,9 +1,10 @@
-import { defineConfig } from 'dumi';
 import path from 'path';
+import { defineConfig } from 'dumi';
+import * as fs from 'fs-extra';
+
 import rehypeAntd from './.dumi/rehypeAntd';
 import remarkAntd from './.dumi/remarkAntd';
 import { version } from './package.json';
-import * as fs from 'fs-extra';
 
 export default defineConfig({
   plugins: ['dumi-plugin-color-chunk'],
@@ -14,6 +15,7 @@ export default defineConfig({
   ssr: process.env.NODE_ENV === 'production' ? {} : false,
   hash: true,
   mfsu: false,
+  live: true,
   crossorigin: {},
   outputPath: '_site',
   favicons: ['https://gw.alipayobjects.com/zos/rmsportal/rlpTLlbMzTNYuZGGCVYM.png'],
@@ -34,6 +36,8 @@ export default defineConfig({
     'antd/es': path.join(__dirname, 'components'),
     'antd/locale': path.join(__dirname, 'components/locale'),
     antd: path.join(__dirname, 'components'),
+    // https://github.com/ant-design/ant-design/issues/46628
+    '@ant-design/icons$': '@ant-design/icons/lib',
   },
   extraRehypePlugins: [rehypeAntd],
   extraRemarkPlugins: [remarkAntd],

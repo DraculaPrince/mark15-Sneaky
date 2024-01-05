@@ -37,7 +37,6 @@ return <Breadcrumb routes={[{ breadcrumbName: 'sample' }]} />;
 <!-- prettier-ignore -->
 <code src="./demo/basic.tsx">Basic Usage</code>
 <code src="./demo/withIcon.tsx">With an Icon</code>
-<code src="./demo/react-router.tsx" iframe="200">react-router V6</code>
 <code src="./demo/separator.tsx">Configuring the Separator</code>
 <code src="./demo/overlay.tsx">Bread crumbs with drop down menu</code>
 <code src="./demo/separator-component.tsx">Configuring the Separator Independently</code>
@@ -54,7 +53,7 @@ Common props ref：[Common props](/docs/react/common-props)
 | --- | --- | --- | --- | --- |
 | itemRender | Custom item renderer | (route, params, routes, paths) => ReactNode | - |  |
 | params | Routing parameters | object | - |  |
-| items | The routing stack information of router | [items\[\]](#ItemType) | - | 5.3.0 |
+| items | The routing stack information of router | [ItemType\[\]](#ItemType) | - | 5.3.0 |
 | separator | Custom separator | ReactNode | `/` |  |
 
 ### ItemType

@@ -7,6 +7,7 @@ import RcTreeSelect, { SHOW_ALL, SHOW_CHILD, SHOW_PARENT, TreeNode } from 'rc-tr
 import type { BaseOptionType, DefaultOptionType } from 'rc-tree-select/lib/TreeSelect';
 import omit from 'rc-util/lib/omit';
 
+import { useZIndex } from '../_util/hooks/useZIndex';
 import type { SelectCommonPlacement } from '../_util/motion';
 import { getTransitionName } from '../_util/motion';
 import genPurePanel from '../_util/PurePanel';
@@ -16,13 +17,14 @@ import { devUseWarning } from '../_util/warning';
 import { ConfigContext } from '../config-provider';
 import DefaultRenderEmpty from '../config-provider/defaultRenderEmpty';
 import DisabledContext from '../config-provider/DisabledContext';
+import useCSSVarCls from '../config-provider/hooks/useCSSVarCls';
 import useSize from '../config-provider/hooks/useSize';
 import type { SizeType } from '../config-provider/SizeContext';
 import { FormItemInputContext } from '../form/context';
+import mergedBuiltinPlacements from '../select/mergedBuiltinPlacements';
 import useSelectStyle from '../select/style';
-import useBuiltinPlacements from '../select/useBuiltinPlacements';
-import useShowArrow from '../select/useShowArrow';
 import useIcons from '../select/useIcons';
+import useShowArrow from '../select/useShowArrow';
 import { useCompactItemContext } from '../space/Compact';
 import type { AntTreeNodeProps, TreeProps } from '../tree';
 import type { SwitcherIcon } from '../tree/Tree';
@@ -150,8 +152,10 @@ const InternalTreeSelect = <
   const treeSelectPrefixCls = getPrefixCls('tree-select', customizePrefixCls);
   const { compactSize, compactItemClassnames } = useCompactItemContext(prefixCls, direction);
 
-  const [wrapSelectSSR, hashId] = useSelectStyle(prefixCls);
-  const [wrapTreeSelectSSR] = useStyle(treeSelectPrefixCls, treePrefixCls);
+  const rootCls = useCSSVarCls(prefixCls);
+  const treeSelectRootCls = useCSSVarCls(treeSelectPrefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useSelectStyle(prefixCls, rootCls);
+  const [treeSelectWrapCSSVar] = useStyle(treeSelectPrefixCls, treePrefixCls, treeSelectRootCls);
 
   const mergedDropdownClassName = classNames(
     popupClassName || dropdownClassName,
@@ -160,6 +164,9 @@ const InternalTreeSelect = <
       [`${treeSelectPrefixCls}-dropdown-rtl`]: direction === 'rtl',
     },
     rootClassName,
+    cssVarCls,
+    rootCls,
+    treeSelectRootCls,
     hashId,
   );
 
@@ -216,8 +223,6 @@ const InternalTreeSelect = <
     return direction === 'rtl' ? 'bottomRight' : 'bottomLeft';
   }, [placement, direction]);
 
-  const mergedBuiltinPlacements = useBuiltinPlacements(builtinPlacements, popupOverflow);
-
   const mergedSize = useSize((ctx) => customizeSize ?? compactSize ?? ctx);
 
   // ===================== Disabled =====================
@@ -237,6 +242,9 @@ const InternalTreeSelect = <
     compactItemClassnames,
     className,
     rootClassName,
+    cssVarCls,
+    rootCls,
+    treeSelectRootCls,
     hashId,
   );
 
@@ -249,13 +257,16 @@ const InternalTreeSelect = <
     />
   );
 
+  // ============================ zIndex ============================
+  const [zIndex] = useZIndex('SelectLike', props.dropdownStyle?.zIndex as number);
+
   const returnNode = (
     <RcTreeSelect
       virtual={virtual}
       disabled={mergedDisabled}
       {...selectProps}
       dropdownMatchSelectWidth={mergedPopupMatchSelectWidth}
-      builtinPlacements={mergedBuiltinPlacements}
+      builtinPlacements={mergedBuiltinPlacements(builtinPlacements, popupOverflow)}
       ref={ref}
       prefixCls={prefixCls}
       className={mergedClassName}
@@ -276,22 +287,25 @@ const InternalTreeSelect = <
       getPopupContainer={getPopupContainer || getContextPopupContainer}
       treeMotion={null}
       dropdownClassName={mergedDropdownClassName}
+      dropdownStyle={{
+        ...props.dropdownStyle,
+        zIndex,
+      }}
       choiceTransitionName={getTransitionName(rootPrefixCls, '', choiceTransitionName)}
       transitionName={getTransitionName(rootPrefixCls, 'slide-up', transitionName)}
       treeExpandAction={treeExpandAction}
     />
   );
 
-  return wrapSelectSSR(wrapTreeSelectSSR(returnNode));
+  return wrapCSSVar(treeSelectWrapCSSVar(returnNode));
 };
 
 const TreeSelectRef = React.forwardRef(InternalTreeSelect) as <
   ValueType = any,
   OptionType extends BaseOptionType | DefaultOptionType = DefaultOptionType,
 >(
-  props: React.PropsWithChildren<TreeSelectProps<ValueType, OptionType>> & {
-    ref?: React.Ref<BaseSelectRef>;
-  },
+  props: React.PropsWithChildren<TreeSelectProps<ValueType, OptionType>> &
+    React.RefAttributes<BaseSelectRef>,
 ) => React.ReactElement;
 
 type InternalTreeSelectType = typeof TreeSelectRef;

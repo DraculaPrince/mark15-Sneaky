@@ -4,6 +4,8 @@ import type { OverrideToken } from '../../theme/interface';
 import type { ThemeConfig } from '../context';
 import { defaultConfig } from '../../theme/internal';
 import markTheme from '../../_mark-style/markTheme';
+import useThemeKey from './useThemeKey';
+import { devUseWarning } from '../../_util/warning';
 
 export default function useTheme(
   theme: ThemeConfig,
@@ -15,9 +17,26 @@ export default function useTheme(
     : markTheme.components;
   theme.token = theme.token ? { ...markTheme.token, ...theme.token } : markTheme.token;
 
+  const warning = devUseWarning('ConfigProvider');
+
   const themeConfig = theme || {};
   const parentThemeConfig: ThemeConfig =
     themeConfig.inherit === false || !parentTheme ? defaultConfig : parentTheme;
+
+  const themeKey = useThemeKey();
+
+  if (process.env.NODE_ENV !== 'production') {
+    const cssVarEnabled = themeConfig.cssVar || parentThemeConfig.cssVar;
+    const validKey = !!(
+      (typeof themeConfig.cssVar === 'object' && themeConfig.cssVar?.key) ||
+      themeKey
+    );
+    warning(
+      !cssVarEnabled || validKey,
+      'breaking',
+      'Missing key in `cssVar` config. Please upgrade to React 18 or set `cssVar.key` manually in each ConfigProvider inside `cssVar` enabled ConfigProvider.',
+    );
+  }
 
   return useMemo<ThemeConfig | undefined>(
     () => {
@@ -37,6 +56,14 @@ export default function useTheme(
         } as any;
       });
 
+      const cssVarKey = `css-var-${themeKey.replace(/:/g, '')}`;
+      const mergedCssVar = (themeConfig.cssVar ?? parentThemeConfig.cssVar) && {
+        prefix: 'ant', // Default to ant
+        ...(typeof parentThemeConfig.cssVar === 'object' ? parentThemeConfig.cssVar : {}),
+        ...(typeof themeConfig.cssVar === 'object' ? themeConfig.cssVar : {}),
+        key: (typeof themeConfig.cssVar === 'object' && themeConfig.cssVar?.key) || cssVarKey,
+      };
+
       // Base token
       return {
         ...parentThemeConfig,
@@ -47,6 +74,7 @@ export default function useTheme(
           ...themeConfig.token,
         },
         components: mergedComponents,
+        cssVar: mergedCssVar,
       };
     },
     [themeConfig, parentThemeConfig],

@@ -75,11 +75,11 @@ type LoadingConfigType = {
 
 function getLoadingConfig(loading: BaseButtonProps['loading']): LoadingConfigType {
   if (typeof loading === 'object' && loading) {
-    const delay = loading?.delay;
-    const isDelay = !Number.isNaN(delay) && typeof delay === 'number';
+    let delay = loading?.delay;
+    delay = !Number.isNaN(delay) && typeof delay === 'number' ? delay : 0;
     return {
-      loading: false,
-      delay: isDelay ? delay : 0,
+      loading: delay <= 0,
+      delay,
     };
   }
 
@@ -118,7 +118,7 @@ const InternalButton: React.ForwardRefRenderFunction<
   const { getPrefixCls, autoInsertSpaceInButton, direction, button } = useContext(ConfigContext);
   const prefixCls = getPrefixCls('btn', customizePrefixCls);
 
-  const [wrapSSR, hashId] = useStyle(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle(prefixCls);
 
   const disabled = useContext(DisabledContext);
   const mergedDisabled = customDisabled ?? disabled;
@@ -215,6 +215,7 @@ const InternalButton: React.ForwardRefRenderFunction<
   const classes = classNames(
     prefixCls,
     hashId,
+    cssVarCls,
     {
       [`${prefixCls}-${shape}`]: shape !== 'default' && shape,
       [`${prefixCls}-${type}`]: type,
@@ -254,15 +255,17 @@ const InternalButton: React.ForwardRefRenderFunction<
     children || children === 0 ? spaceChildren(children, needInserted && autoInsertSpace) : null;
 
   if (linkButtonRestProps.href !== undefined) {
-    return wrapSSR(
+    return wrapCSSVar(
       <a
         {...linkButtonRestProps}
         className={classNames(classes, {
           [`${prefixCls}-disabled`]: mergedDisabled,
         })}
+        href={mergedDisabled ? undefined : linkButtonRestProps.href}
         style={fullStyle}
         onClick={handleClick}
         ref={buttonRef as React.Ref<HTMLAnchorElement>}
+        tabIndex={mergedDisabled ? -1 : 0}
       >
         {iconNode}
         {kids}
@@ -296,7 +299,7 @@ const InternalButton: React.ForwardRefRenderFunction<
     );
   }
 
-  return wrapSSR(buttonNode);
+  return wrapCSSVar(buttonNode);
 };
 
 const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(

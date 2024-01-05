@@ -7,6 +7,7 @@ import type { OptionProps } from 'rc-select/lib/Option';
 import type { BaseOptionType, DefaultOptionType } from 'rc-select/lib/Select';
 import omit from 'rc-util/lib/omit';
 
+import { useZIndex } from '../_util/hooks/useZIndex';
 import type { SelectCommonPlacement } from '../_util/motion';
 import { getTransitionName } from '../_util/motion';
 import genPurePanel from '../_util/PurePanel';
@@ -16,14 +17,16 @@ import { devUseWarning } from '../_util/warning';
 import { ConfigContext } from '../config-provider';
 import DefaultRenderEmpty from '../config-provider/defaultRenderEmpty';
 import DisabledContext from '../config-provider/DisabledContext';
+import useCSSVarCls from '../config-provider/hooks/useCSSVarCls';
 import useSize from '../config-provider/hooks/useSize';
 import type { SizeType } from '../config-provider/SizeContext';
 import { FormItemInputContext } from '../form/context';
 import { useCompactItemContext } from '../space/Compact';
+import mergedBuiltinPlacements from './mergedBuiltinPlacements';
 import useStyle from './style';
-import useBuiltinPlacements from './useBuiltinPlacements';
-import useShowArrow from './useShowArrow';
 import useIcons from './useIcons';
+import useShowArrow from './useShowArrow';
+import { useToken } from '../theme/internal';
 
 type RawValue = string | number;
 
@@ -88,7 +91,7 @@ const InternalSelect = <
     dropdownClassName,
     listHeight = 256,
     placement,
-    listItemHeight = 24,
+    listItemHeight: customListItemHeight,
     size: customizeSize,
     disabled: customDisabled,
     notFoundContent,
@@ -114,13 +117,18 @@ const InternalSelect = <
     select,
   } = React.useContext(ConfigContext);
 
+  const [, token] = useToken();
+
+  const listItemHeight = customListItemHeight ?? token?.controlHeight;
+
   const prefixCls = getPrefixCls('select', customizePrefixCls);
   const rootPrefixCls = getPrefixCls();
   const direction = propDirection ?? contextDirection;
 
   const { compactSize, compactItemClassnames } = useCompactItemContext(prefixCls, direction);
 
-  const [wrapSSR, hashId] = useStyle(prefixCls);
+  const rootCls = useCSSVarCls(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle(prefixCls, rootCls);
 
   const mode = React.useMemo(() => {
     const { mode: m } = props as InternalSelectProps<OptionType>;
@@ -180,12 +188,14 @@ const InternalSelect = <
     'itemIcon',
   ]);
 
-  const rcSelectRtlDropdownClassName = classNames(
+  const mergedPopupClassName = classNames(
     popupClassName || dropdownClassName,
     {
       [`${prefixCls}-dropdown-${direction}`]: direction === 'rtl',
     },
     rootClassName,
+    cssVarCls,
+    rootCls,
     hashId,
   );
 
@@ -208,6 +218,8 @@ const InternalSelect = <
     select?.className,
     className,
     rootClassName,
+    cssVarCls,
+    rootCls,
     hashId,
   );
 
@@ -218,8 +230,6 @@ const InternalSelect = <
     }
     return direction === 'rtl' ? 'bottomRight' : 'bottomLeft';
   }, [placement, direction]);
-
-  const mergedBuiltinPlacements = useBuiltinPlacements(builtinPlacements, popupOverflow);
 
   // ====================== Warning ======================
   if (process.env.NODE_ENV !== 'production') {
@@ -240,8 +250,11 @@ const InternalSelect = <
     );
   }
 
+  // ====================== zIndex =========================
+  const [zIndex] = useZIndex('SelectLike', props.dropdownStyle?.zIndex as number);
+
   // ====================== Render =======================
-  return wrapSSR(
+  return wrapCSSVar(
     <RcSelect<ValueType, OptionType>
       ref={ref}
       virtual={virtual}
@@ -249,7 +262,7 @@ const InternalSelect = <
       {...selectProps}
       style={{ ...select?.style, ...style }}
       dropdownMatchSelectWidth={mergedPopupMatchSelectWidth}
-      builtinPlacements={mergedBuiltinPlacements}
+      builtinPlacements={mergedBuiltinPlacements(builtinPlacements, popupOverflow)}
       transitionName={getTransitionName(rootPrefixCls, 'slide-up', props.transitionName)}
       listHeight={listHeight}
       listItemHeight={listItemHeight}
@@ -264,8 +277,12 @@ const InternalSelect = <
       notFoundContent={mergedNotFound}
       className={mergedClassName}
       getPopupContainer={getPopupContainer || getContextPopupContainer}
-      dropdownClassName={rcSelectRtlDropdownClassName}
+      dropdownClassName={mergedPopupClassName}
       disabled={mergedDisabled}
+      dropdownStyle={{
+        ...props?.dropdownStyle,
+        zIndex,
+      }}
     />,
   );
 };
@@ -278,9 +295,8 @@ const Select = React.forwardRef(InternalSelect) as unknown as (<
   ValueType = any,
   OptionType extends BaseOptionType | DefaultOptionType = DefaultOptionType,
 >(
-  props: React.PropsWithChildren<SelectProps<ValueType, OptionType>> & {
-    ref?: React.Ref<BaseSelectRef>;
-  },
+  props: React.PropsWithChildren<SelectProps<ValueType, OptionType>> &
+    React.RefAttributes<BaseSelectRef>,
 ) => React.ReactElement) & {
   displayName?: string;
   SECRET_COMBOBOX_MODE_DO_NOT_USE: string;

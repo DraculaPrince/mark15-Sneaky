@@ -1,24 +1,26 @@
+import * as React from 'react';
+import { useMemo } from 'react';
 import classNames from 'classnames';
 import FieldForm, { List, useWatch } from 'rc-field-form';
 import type { FormProps as RcFormProps } from 'rc-field-form/lib/Form';
 import type { InternalNamePath, ValidateErrorEntity } from 'rc-field-form/lib/interface';
-import * as React from 'react';
-import { useMemo } from 'react';
 import type { Options } from 'scroll-into-view-if-needed';
+
 import { ConfigContext } from '../config-provider';
 import DisabledContext, { DisabledContextProvider } from '../config-provider/DisabledContext';
-import type { SizeType } from '../config-provider/SizeContext';
-import { SizeContextProvider } from '../config-provider/SizeContext';
+import useCSSVarCls from '../config-provider/hooks/useCSSVarCls';
 import useSize from '../config-provider/hooks/useSize';
+import type { SizeType } from '../config-provider/SizeContext';
+import SizeContext from '../config-provider/SizeContext';
 import type { ColProps } from '../grid/col';
 import type { FormContextProps } from './context';
 import { FormContext, FormProvider } from './context';
+import type { FeedbackIcons } from './FormItem';
 import useForm, { type FormInstance } from './hooks/useForm';
 import useFormWarning from './hooks/useFormWarning';
 import type { FormLabelAlign } from './interface';
 import useStyle from './style';
 import ValidateMessagesContext from './validateMessagesContext';
-import type { FeedbackIcons } from './FormItem';
 
 export type RequiredMark =
   | boolean
@@ -87,12 +89,12 @@ const InternalForm: React.ForwardRefRenderFunction<FormInstance, FormProps> = (p
       return requiredMark;
     }
 
-    if (contextForm && contextForm.requiredMark !== undefined) {
-      return contextForm.requiredMark;
-    }
-
     if (hideRequiredMark) {
       return false;
+    }
+
+    if (contextForm && contextForm.requiredMark !== undefined) {
+      return contextForm.requiredMark;
     }
 
     return true;
@@ -103,7 +105,8 @@ const InternalForm: React.ForwardRefRenderFunction<FormInstance, FormProps> = (p
   const prefixCls = getPrefixCls('form', customizePrefixCls);
 
   // Style
-  const [wrapSSR, hashId] = useStyle(prefixCls);
+  const rootCls = useCSSVarCls(prefixCls);
+  const [wrapCSSVar, hashId, cssVarCls] = useStyle(prefixCls, rootCls);
 
   const formClassName = classNames(
     prefixCls,
@@ -113,6 +116,8 @@ const InternalForm: React.ForwardRefRenderFunction<FormInstance, FormProps> = (p
       [`${prefixCls}-rtl`]: direction === 'rtl',
       [`${prefixCls}-${mergedSize}`]: mergedSize,
     },
+    cssVarCls,
+    rootCls,
     hashId,
     contextForm?.className,
     className,
@@ -177,9 +182,9 @@ const InternalForm: React.ForwardRefRenderFunction<FormInstance, FormProps> = (p
     }
   };
 
-  return wrapSSR(
+  return wrapCSSVar(
     <DisabledContextProvider disabled={disabled}>
-      <SizeContextProvider size={mergedSize}>
+      <SizeContext.Provider value={mergedSize}>
         <FormProvider
           {...{
             // This is not list in API, we pass with spread
@@ -198,13 +203,13 @@ const InternalForm: React.ForwardRefRenderFunction<FormInstance, FormProps> = (p
             />
           </FormContext.Provider>
         </FormProvider>
-      </SizeContextProvider>
+      </SizeContext.Provider>
     </DisabledContextProvider>,
   );
 };
 
 const Form = React.forwardRef<FormInstance, FormProps>(InternalForm) as (<Values = any>(
-  props: React.PropsWithChildren<FormProps<Values>> & { ref?: React.Ref<FormInstance<Values>> },
+  props: React.PropsWithChildren<FormProps<Values>> & React.RefAttributes<FormInstance<Values>>,
 ) => React.ReactElement) & { displayName?: string };
 
 if (process.env.NODE_ENV !== 'production') {

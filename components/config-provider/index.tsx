@@ -24,11 +24,11 @@ import defaultSeedToken from '../theme/themes/seed';
 import type {
   BadgeConfig,
   ButtonConfig,
-  DrawerConfig,
   ComponentStyleConfig,
   ConfigConsumerProps,
   CSPConfig,
   DirectionType,
+  DrawerConfig,
   FlexConfig,
   ModalConfig,
   PopupOverflow,
@@ -198,6 +198,8 @@ export interface ConfigProviderProps {
   tree?: ComponentStyleConfig;
   colorPicker?: ComponentStyleConfig;
   datePicker?: ComponentStyleConfig;
+  rangePicker?: ComponentStyleConfig;
+  dropdown?: ComponentStyleConfig;
   flex?: FlexConfig;
   /**
    * Wave is special component which only patch on the effect of component interaction.
@@ -339,8 +341,10 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
     tree,
     colorPicker,
     datePicker,
+    rangePicker,
     flex,
     wave,
+    dropdown,
     warning: warningConfig,
   } = props;
 
@@ -430,8 +434,10 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
     tree,
     colorPicker,
     datePicker,
+    rangePicker,
     flex,
     wave,
+    dropdown,
     warning: warningConfig,
   };
 
@@ -522,7 +528,7 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
 
   // ================================ Dynamic theme ================================
   const memoTheme = React.useMemo(() => {
-    const { algorithm, token, components, ...rest } = mergedTheme || {};
+    const { algorithm, token, components, cssVar, ...rest } = mergedTheme || {};
     const themeObj =
       algorithm && (!Array.isArray(algorithm) || algorithm.length > 0)
         ? createTheme(algorithm)
@@ -547,16 +553,22 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
       parsedComponents[componentName] = parsedToken;
     });
 
+    const mergedToken = {
+      ...defaultSeedToken,
+      ...token,
+    };
+
     return {
       ...rest,
       theme: themeObj,
 
-      token: {
-        ...defaultSeedToken,
-        ...token,
-      },
-
+      token: mergedToken,
       components: parsedComponents,
+      override: {
+        override: mergedToken,
+        ...parsedComponents,
+      },
+      cssVar: cssVar as Exclude<ThemeConfig['cssVar'], boolean>,
     };
   }, [mergedTheme]);
 

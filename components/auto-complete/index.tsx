@@ -4,6 +4,7 @@ import type { BaseSelectRef } from 'rc-select';
 import toArray from 'rc-util/lib/Children/toArray';
 import omit from 'rc-util/lib/omit';
 
+import { useZIndex } from '../_util/hooks/useZIndex';
 import genPurePanel from '../_util/PurePanel';
 import { isValidElement } from '../_util/reactNode';
 import type { InputStatus } from '../_util/statusUtils';
@@ -128,6 +129,9 @@ const AutoComplete: React.ForwardRefRenderFunction<RefSelectProps, AutoCompleteP
 
   const prefixCls = getPrefixCls('select', customizePrefixCls);
 
+  // ============================ zIndex ============================
+  const [zIndex] = useZIndex('SelectLike', props.dropdownStyle?.zIndex as number);
+
   return (
     <Select
       ref={ref}
@@ -135,6 +139,10 @@ const AutoComplete: React.ForwardRefRenderFunction<RefSelectProps, AutoCompleteP
       {...omit(props, ['dataSource', 'dropdownClassName'])}
       prefixCls={prefixCls}
       popupClassName={popupClassName || dropdownClassName}
+      dropdownStyle={{
+        ...props.dropdownStyle,
+        zIndex,
+      }}
       className={classNames(`${prefixCls}-auto-complete`, className)}
       mode={Select.SECRET_COMBOBOX_MODE_DO_NOT_USE as SelectProps['mode']}
       {...{
@@ -153,9 +161,8 @@ const RefAutoComplete = React.forwardRef<RefSelectProps, AutoCompleteProps>(
   ValueType = any,
   OptionType extends BaseOptionType | DefaultOptionType = DefaultOptionType,
 >(
-  props: React.PropsWithChildren<AutoCompleteProps<ValueType, OptionType>> & {
-    ref?: React.Ref<BaseSelectRef>;
-  },
+  props: React.PropsWithChildren<AutoCompleteProps<ValueType, OptionType>> &
+    React.RefAttributes<BaseSelectRef>,
 ) => React.ReactElement) & {
   displayName?: string;
   Option: typeof Option;
