@@ -56,10 +56,16 @@ export default {
       itemActiveBg: 'rgb(50, 112, 255)',
       wireframe: true,
       colorBorder: 'rgb(220, 222, 226)',
+      colorBgTextActive: 'rgba(255, 255, 255, 0.15)',
     },
     Checkbox: {
       colorTextDisabled: 'rgb(78, 89, 105)',
       colorBgContainerDisabled: 'rgb(242, 243, 245)',
+    },
+    Descriptions: {
+      titleColor: 'rgb(29, 33, 41)',
+      colorText: 'rgb(29, 33, 41)',
+      colorTextSecondary: 'rgb(134, 144, 156)',
     },
   },
   token: {
