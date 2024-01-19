@@ -16,6 +16,7 @@ import type { SizeType } from '../config-provider/SizeContext';
 import type { CollapsibleType } from './CollapsePanel';
 import CollapsePanel from './CollapsePanel';
 import useStyle from './style';
+import ExpandIconPatch from '../_mark-patch/collapse/ExpandIconPatch';
 
 /** @deprecated Please use `start` | `end` instead */
 type ExpandIconPositionLegacy = 'left' | 'right';
@@ -99,11 +100,11 @@ const Collapse = React.forwardRef<HTMLDivElement, CollapseProps>((props, ref) =>
 
   const renderExpandIcon = (panelProps: PanelProps = {}) => {
     const icon = (
-      expandIcon ? (
-        expandIcon(panelProps)
-      ) : (
-        <RightOutlined rotate={panelProps.isActive ? 90 : undefined} />
-      )
+      expandIcon
+        ? expandIcon(panelProps)
+        : <ExpandIconPatch isActive={panelProps.isActive} /> || (
+            <RightOutlined rotate={panelProps.isActive ? 0 : undefined} />
+          )
     ) as React.ReactNode;
 
     return cloneElement(icon, () => ({
