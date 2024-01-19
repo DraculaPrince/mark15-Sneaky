@@ -10,6 +10,7 @@ import { genFocusOutline, genFocusStyle, resetComponent } from '../../style';
 import type { FullToken, GenerateStyle, GetDefaultToken } from '../../theme/internal';
 import { genStyleHooks, mergeToken } from '../../theme/internal';
 import type { GenStyleFn } from 'antd/es/theme/util/genComponentStyleHook';
+import { miniPaginationPatch } from 'antd/es/_mark-patch/pagination/style';
 
 export interface ComponentToken {
   /**
@@ -530,6 +531,8 @@ const genPaginationItemStyle: GenerateStyle<PaginationToken, CSSObject> = (token
         fontWeight: token.fontWeightStrong,
         backgroundColor: token.itemActiveBg,
         borderColor: token.colorPrimary,
+        // 【mark15】分页器修改
+        ...miniPaginationPatch(token).active,
 
         a: {
           color: token.colorPrimary,

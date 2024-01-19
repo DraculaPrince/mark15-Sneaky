@@ -1,6 +1,6 @@
 import type { ThemeConfig } from '../config-provider/context';
 
-export default {
+export default ({
   components: {
     Button: {
       colorError: '#EE5050',
@@ -69,6 +69,7 @@ export default {
     },
   },
   token: {
+    wireframe: true,
     colorPrimary: '#3270ff',
     colorInfo: '#3270ff',
     colorError: '#ee5050',
@@ -84,4 +85,4 @@ export default {
     colorPrimaryHover: '#457dfe',
     colorPrimaryActive: '#2859cc',
   },
-} as ThemeConfig;
+} as ThemeConfig);
