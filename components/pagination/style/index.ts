@@ -542,7 +542,7 @@ const genPaginationItemStyle: GenerateStyle<PaginationToken, CSSObject> = (token
         backgroundColor: token.itemActiveBg,
         borderColor: token.colorPrimary,
         // 【mark15】分页器修改
-        ...miniPaginationPatch(token).active,
+        ...(miniPaginationPatch(token).active || {}),
 
         a: {
           color: token.colorPrimary,
