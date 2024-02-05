@@ -115,15 +115,19 @@ If you need some features which should not be included in antd, try to extend an
 
 ## How to get the definition which is not export?
 
-antd will export mainly definitions, but not export internal definitions which may be rename or changed. So we recommend you to use Typescript's native ability to get the definition if needed:
+antd expose the basic component definitions. For the unexposed props, you can get them via the utility types provided by antd. For example:
 
 ```tsx
-import { Table } from 'antd';
+import type { Checkbox, CheckboxProps, GetProp, GetProps, GetRef, Input } from 'antd';
 
-type Props<T extends (...args: any) => any> = Parameters<T>[0];
+// Get Props
+type CheckboxGroupProps = GetProps<typeof Checkbox.Group>;
 
-type TableProps = Props<typeof Table<{ key: string; name: string; age: number }>>;
-type DataSource = TableProps['dataSource'];
+// Get Prop
+type CheckboxValue = GetProp<CheckboxProps, 'value'>;
+
+// Get Ref
+type InputRef = GetRef<typeof Input>;
 ```
 
 ## Date-related components locale is not working?

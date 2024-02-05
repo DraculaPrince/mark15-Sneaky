@@ -1,5 +1,5 @@
 import type { CSSObject } from '@ant-design/cssinjs';
-import type { SelectToken } from '.';
+import type { SelectToken } from './token';
 import { resetComponent, textEllipsis } from '../../style';
 import {
   initMoveMotion,
@@ -154,6 +154,11 @@ const genSingleStyle: GenerateStyle<SelectToken> = (token) => {
             '&-grouped': {
               paddingInlineStart: token.calc(token.controlPaddingHorizontal).mul(2).equal(),
             },
+          },
+
+          '&-empty': {
+            ...genItemStyle(token),
+            color: token.colorTextDisabled,
           },
         },
 
