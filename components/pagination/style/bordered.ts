@@ -3,7 +3,7 @@ import type { PaginationToken } from '.';
 import { prepareComponentToken, prepareToken } from '.';
 import type { GenerateStyle } from '../../theme/interface';
 import { unit } from '@ant-design/cssinjs';
-import { borderPaginationPatch } from 'antd/es/_mark-patch/pagination/style';
+import { borderPaginationPatch } from '../../_mark-patch/pagination/style';
 
 const genBorderedStyle: GenerateStyle<PaginationToken> = (token) => {
   const { componentCls } = token;

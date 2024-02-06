@@ -10,7 +10,7 @@ import { genFocusOutline, genFocusStyle, resetComponent } from '../../style';
 import type { FullToken, GenerateStyle, GetDefaultToken } from '../../theme/internal';
 import { genStyleHooks, mergeToken } from '../../theme/internal';
 import type { GenStyleFn } from 'antd/es/theme/util/genComponentStyleHook';
-import { miniPaginationPatch } from 'antd/es/_mark-patch/pagination/style';
+import { miniPaginationPatch } from '../../_mark-patch/pagination/style';
 import { genBaseOutlinedStyle, genDisabledStyle } from '../../input/style/variants';
 
 export interface ComponentToken {

@@ -2,7 +2,7 @@ import { unit } from '@ant-design/cssinjs';
 
 import { resetComponent, resetIcon } from '../../../style';
 import type { GenerateStyle, FullToken } from '../../../theme/internal';
-import { collapseHeaderBgColor } from 'antd/es/_mark-patch/cssAtomPatch';
+import { collapseHeaderBgColor } from '../../cssAtomPatch';
 
 type CollapseToken = FullToken<'Collapse'> & {
   collapseHeaderPaddingSM: string;
