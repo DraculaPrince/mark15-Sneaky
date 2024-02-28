@@ -161,6 +161,11 @@ describe('Alert', () => {
     const { container } = render(<Alert closeText="close" />);
 
     expect(warnSpy).toHaveBeenCalledWith(
+      `Warning: [antd: Alert] \`closeText\` is deprecated. Please use \`closable.closeIcon\` instead.`,
+    );
+
+    expect(container.querySelector('.ant-alert-close-icon')?.textContent).toBe('close');
+
       `Warning: [antd: Alert] \`closeText\` is deprecated. Please use \`closeIcon\` instead.`,
     );
 
