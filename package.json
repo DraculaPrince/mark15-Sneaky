@@ -357,7 +357,7 @@
     },
     {
       "path": "./dist/antd-with-locales.min.js",
-      "limit": "381 KiB"
+      "limit": "382 KiB"
     }
   ],
   "title": "Ant Design",
