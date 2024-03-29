@@ -102,7 +102,8 @@ const Collapse = React.forwardRef<HTMLDivElement, CollapseProps>((props, ref) =>
     const icon = (
       expandIcon
         ? expandIcon(panelProps)
-        : <ExpandIconPatch isActive={panelProps.isActive} /> || (
+        : // [mark15]更换折叠面板图标
+          <ExpandIconPatch isActive={panelProps.isActive} /> || (
             <RightOutlined rotate={panelProps.isActive ? 0 : undefined} />
           )
     ) as React.ReactNode;

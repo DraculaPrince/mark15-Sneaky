@@ -320,6 +320,7 @@ export default genStyleHooks(
       collapseHeaderPaddingLG: `${unit(token.padding)} ${unit(token.paddingLG)}`,
       collapsePanelBorderRadius: token.borderRadiusLG,
     });
+    // [mark15]collapse样式修改
     return [
       genBaseStyle(collapseToken),
       genBaseStylePatch(collapseToken),
