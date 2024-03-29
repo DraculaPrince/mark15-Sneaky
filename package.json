@@ -1,6 +1,6 @@
 {
   "name": "mark15",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "packageManager": "^npm@9.0.0",
   "description": "An enterprise-class UI design language and React components implementation",
   "keywords": [
